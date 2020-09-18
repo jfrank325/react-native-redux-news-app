@@ -1,13 +1,17 @@
 import React from 'react';
 import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import * as newsAction from '../redux/actions/newsAction';
 //rnfes
 
 const NewsDetailsScreen = (props) => {
   const { articleUrl } = props.route.params;
+  const dispatch = useDispatch();
+  const article = useSelector((state) => state.news.articles.articles.find((article) => article.url === articleUrl));
+  const isFav = useSelector((state) => state.news.favorites.some((article) => article.url === articleUrl));
 
-  const article = useSelector((state = state.news.articles.articles.find((article) => article.url === articleUrl)));
+  console.log(article);
   return (
     <View style={styles.container}>
       <View style={styles.heading}>
@@ -15,13 +19,21 @@ const NewsDetailsScreen = (props) => {
       </View>
       <View>
         <ImageBackground source={{ uri: article.urlToImage }} style={styles.image}>
-          <View style={styles.titleContainer}></View>
-          <Text style={styles.author}>{article.author}</Text>
-          <MaterialIcons />
+          <View style={styles.titleContainer}>
+            <Text style={styles.author}>{article.author}</Text>
+            <MaterialIcons
+              onPress={() => {
+                dispatch(newsAction.toggleFavorites(article.url));
+              }}
+              name={isFav ? 'favorite' : 'favorite-border'}
+              color="#72bcd4"
+              size={24}
+            />
+          </View>
         </ImageBackground>
       </View>
       <View style={styles.description}>
-        <Text style={styles.container}>{article.description}</Text>
+        <Text style={styles.descriptionText}>{article.description}</Text>
       </View>
     </View>
   );
